@@ -2,6 +2,7 @@
 public/
 resources/
 .hugo_cache/
+.hugo_build.lock
 
 # 依赖
 node_modules/
