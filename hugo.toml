@@ -1,6 +1,6 @@
 baseURL = "https://www.yunji-tech.example/"
-languageCode = "zh-cn"
 defaultContentLanguage = "zh-cn"
+locale = "zh-cn"
 title = "云际科技"
 enableRobotsTXT = true
 disableKinds = ["taxonomy", "term"]
