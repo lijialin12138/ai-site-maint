@@ -49,7 +49,7 @@ required-checks:
 2. 读取目标文件与相邻文件，确认现有结构与写作风格。
 3. 用最小改动完成修改，不重构无关内容。
 4. 核对品牌名、产品名、联系方式是否与 `hugo.toml` 一致。
-5. 运行 `python tools/ai_maint.py check`。
+5. 改完停下，明确提示管理员在本机运行 `python tools/ai_maint.py check`（AI 运行环境无 Python，无法自行校验），等待管理员回报结果。
 6. 输出变更摘要、校验结果与待人工确认项。
 
 ## 5. 完成标准 + 强制校验（Verify）
@@ -62,8 +62,8 @@ required-checks:
 
 ### 强制校验
 
-- 必跑：`python tools/ai_maint.py check`，退出码必须为 0；无 Python 时用 `node tools/check.mjs` 并标注差异。
-- 校验失败时：回退本次改动，不得带着失败结果交付；连续两次失败停止并上报。
+- 校验由管理员本机执行（AI 环境无 Python/Hugo）。AI 改完必须停下，提示管理员运行 `python tools/ai_maint.py check`（无 Python 时用 `node tools/check.mjs`），并等待回报。
+- 管理员回报「校验失败」时：AI 回退本次改动，不得带着失败结果交付；连续两次失败停止并上报。
 
 ### 审核门槛
 
