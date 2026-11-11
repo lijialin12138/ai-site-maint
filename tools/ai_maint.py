@@ -29,25 +29,28 @@ PRODUCTS = ("云枢", "云眸", "云盾", "云桥")
 
 SKILLS = {
     "content-edit": "L2",
-    "news-publish": "L2",
-    "product-update": "L2",
+    "page-create": "L2",
     "media-manage": "L2",
-    "seo-check": "L1",
-    "link-check": "L1",
-    "build-deploy": "L3",
+    "seo": "L1",
+    "theme-change": "L3",
+    "release": "L3",
+    "qa": "L1",
     "rule-exception": "L3",
 }
 
-REQUIRED_SECTIONS = ("触发条件", "白名单", "黑名单", "执行步骤", "校验要求")
+REQUIRED_SECTIONS = ("触发条件", "允许的操作范围", "禁止的操作范围", "执行步骤", "完成标准")
 
 REQUIRED_FILES = (
     "hugo.toml",
-    "AGENTS.md",
+    ".harness/AGENTS.md",
+    ".harness/SKILL_TEMPLATE.md",
     "content/_index.md",
     "content/about/_index.md",
     "content/products/_index.md",
     "content/news/_index.md",
     "content/contact/_index.md",
+    "data/.gitkeep",
+    "static/.gitkeep",
     "layouts/_default/baseof.html",
     "layouts/_default/list.html",
     "layouts/_default/single.html",
@@ -56,8 +59,8 @@ REQUIRED_FILES = (
     "layouts/partials/footer.html",
     "assets/css/main.css",
     "tools/ai_maint.py",
+    "tools/check.mjs",
     ".harness/README.md",
-    ".harness/templates/SKILL-TEMPLATE.md",
     ".harness/templates/CONTENT-PAGE-TEMPLATE.md",
     ".harness/templates/NEWS-TEMPLATE.md",
     ".harness/templates/CHANGE-PLAN-TEMPLATE.md",
@@ -247,9 +250,12 @@ def check_pages():
             messages.append(f"缺少 TOML front matter：{rel}")
             continue
         fm = parse_toml(fm_raw)
-        for key in ("title", "description"):
+        for key in ("title", "date", "description"):
             if not fm.get(key):
                 messages.append(f"front matter 缺少 {key}：{rel}")
+        desc = fm.get("description", "")
+        if desc and not (40 <= len(desc) <= 120):
+            messages.append(f"description 长度 {len(desc)} 字，应为 40–120 字：{rel}")
         if fm.get("draft") == "true":
             messages.append(f"存在未发布稿件 draft=true：{rel}")
         if re.search(r"^# ", body, re.M):
@@ -347,6 +353,8 @@ def check_skills():
                 messages.append(f"Skill 五段式缺少「{section}」：{rel}")
         if risk == "L3" and "不执行" not in text and "不得执行" not in text:
             messages.append(f"L3 Skill 未声明不执行边界：{rel}")
+        if "不得自行发布" not in text:
+            messages.append(f"Skill 缺少「不得自行发布」硬约束：{rel}")
 
     if expected_dir.is_dir():
         actual = {p.parent.name for p in expected_dir.glob("*/SKILL.md")}
@@ -397,6 +405,7 @@ def write_report(started_at, finished_at):
             "## 说明",
             "",
             "- 本报告由校验脚本生成，不进入站点构建。",
+            "- 本报告只做结构与规范检查，不包含 Hugo 构建验证。",
             "- 校验通过仅代表结构与规范满足要求，事实性内容仍需人工确认。",
             "- 发布属于 L3 操作，须由管理员书面确认后人工执行。",
             "",

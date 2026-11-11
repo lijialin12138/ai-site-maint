@@ -15,23 +15,26 @@ const BRAND = "云际科技";
 const BRAND_EN = "Yunji Tech";
 const SKILLS = {
   "content-edit": "L2",
-  "news-publish": "L2",
-  "product-update": "L2",
+  "page-create": "L2",
   "media-manage": "L2",
-  "seo-check": "L1",
-  "link-check": "L1",
-  "build-deploy": "L3",
+  "seo": "L1",
+  "theme-change": "L3",
+  "release": "L3",
+  "qa": "L1",
   "rule-exception": "L3",
 };
-const REQUIRED_SECTIONS = ["触发条件", "白名单", "黑名单", "执行步骤", "校验要求"];
+const REQUIRED_SECTIONS = ["触发条件", "允许的操作范围", "禁止的操作范围", "执行步骤", "完成标准"];
 const REQUIRED_FILES = [
   "hugo.toml",
-  "AGENTS.md",
+  ".harness/AGENTS.md",
+  ".harness/SKILL_TEMPLATE.md",
   "content/_index.md",
   "content/about/_index.md",
   "content/products/_index.md",
   "content/news/_index.md",
   "content/contact/_index.md",
+  "data/.gitkeep",
+  "static/.gitkeep",
   "layouts/_default/baseof.html",
   "layouts/_default/list.html",
   "layouts/_default/single.html",
@@ -42,7 +45,6 @@ const REQUIRED_FILES = [
   "tools/ai_maint.py",
   "tools/check.mjs",
   ".harness/README.md",
-  ".harness/templates/SKILL-TEMPLATE.md",
   ".harness/templates/CONTENT-PAGE-TEMPLATE.md",
   ".harness/templates/NEWS-TEMPLATE.md",
   ".harness/templates/CHANGE-PLAN-TEMPLATE.md",
@@ -232,8 +234,12 @@ function checkPages() {
       continue;
     }
     const fm = parseToml(raw);
-    for (const key of ["title", "description"]) {
+    for (const key of ["title", "date", "description"]) {
       if (!fm[key]) messages.push(`front matter 缺少 ${key}：${rel}`);
+    }
+    const desc = fm.description || "";
+    if (desc && (desc.length < 40 || desc.length > 120)) {
+      messages.push(`description 长度 ${desc.length} 字，应为 40–120 字：${rel}`);
     }
     if (fm.draft === "true") messages.push(`存在未发布稿件 draft=true：${rel}`);
     if (/^# /m.test(body)) messages.push(`正文出现一级标题：${rel}`);
@@ -334,6 +340,9 @@ function checkSkills() {
     if (risk === "L3" && !text.includes("不执行") && !text.includes("不得执行")) {
       messages.push(`L3 Skill 未声明不执行边界：${rel}`);
     }
+    if (!text.includes("不得自行发布")) {
+      messages.push(`Skill 缺少「不得自行发布」硬约束：${rel}`);
+    }
   }
 
   if (fs.existsSync(skillRoot)) {
@@ -385,6 +394,7 @@ function writeReport(startedAt, finishedAt) {
     "## 说明",
     "",
     "- 本报告由 Node 兜底脚本生成，不进入站点构建。",
+    "- 本报告只做结构与规范检查，不包含 Hugo 构建验证。",
     "- 正式校验入口为 `python tools/ai_maint.py check`，两者规则一致，但 Node 版本不覆盖 Python 的全部运行时细节。",
     "- 校验通过仅代表结构与规范满足要求，事实性内容仍需人工确认。",
     "- 发布属于 L3 操作，须由管理员书面确认后人工执行。",

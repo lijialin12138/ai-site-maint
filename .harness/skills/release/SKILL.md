@@ -1,13 +1,14 @@
 ---
-name: build-deploy
+name: release
 description: 生产构建与发布的高风险流程，只输出发布方案、影响面与回滚步骤，不执行任何改动。
 risk: L3
-version: 1.0.0
+version: 1.1.0
 owner: 发布管理员
 allowed-paths:
   - .harness/reports/
 denied-paths:
   - content/
+  - data/
   - layouts/
   - assets/
   - static/
@@ -15,13 +16,13 @@ denied-paths:
   - tools/
   - public/
   - resources/
-  - AGENTS.md
-  - 服务器与 CDN 配置
+  - .harness/AGENTS.md
+  - .harness/skills/
 required-checks:
   - python tools/ai_maint.py check
 ---
 
-# build-deploy · 构建与发布（L3）
+# release · 构建与发布（L3）
 
 > 风险等级：L3（高风险：只出方案，不执行）
 > 适用角色：发布管理员、运维负责人
@@ -39,7 +40,7 @@ required-checks:
 - 需要紧急修复线上故障：先按 `rule-exception` 申报，再走本流程。
 - 需要修改服务器、Nginx、证书、DNS：超出本仓库范围，直接转运维人工处理。
 
-## 2. 白名单（Allowed）
+## 2. 允许的操作范围（白名单）
 
 | 路径 | 允许操作 | 约束 |
 | --- | --- | --- |
@@ -48,14 +49,15 @@ required-checks:
 
 只允许写方案文档，不得写入 `public/`、`resources/` 或任何站点源文件。
 
-## 3. 黑名单（Denied）
+## 3. 禁止的操作范围（黑名单）
 
 - 禁止执行 `hugo`、`hugo --minify`、`hugo deploy` 等构建或发布命令。
-- 禁止改动 `content/`、`layouts/`、`assets/`、`static/`、`hugo.toml`、`tools/`、`AGENTS.md`。
+- 禁止改动 `content/`、`data/`、`layouts/`、`assets/`、`static/`、`hugo.toml`、`tools/`、`.harness/AGENTS.md`、`.harness/skills/`。
 - 禁止上传产物、操作对象存储、刷新 CDN、修改 DNS、重启服务。
 - 禁止读取、传递或写入任何密钥、Token、证书私钥、CI 凭据。
 - 禁止在未经管理员书面确认的情况下把方案标记为「已执行」。
 - 禁止跳过校验直接发布，禁止关闭校验脚本或修改其判定逻辑。
+- **AI 不得自行发布**，发布动作只能由人工执行。
 
 ## 4. 执行步骤（Steps）
 
@@ -69,11 +71,22 @@ required-checks:
 8. 等待管理员书面确认；确认后由人工执行，AI 不代为操作。
 9. 人工执行后回填结果与线上抽查记录，方案归档。
 
-## 5. 校验要求（Verify）
+## 5. 完成标准 + 强制校验（Verify）
+
+### 完成标准
+
+- 方案包含：变更清单、影响面、构建步骤、发布步骤、回滚方案、风险与窗口，六项齐全。
+- 方案中所有命令标注「由人工执行」，AI 未执行任何构建或发布命令。
+- 发布后由人工完成五个页面抽查：首页、关于、产品、新闻、联系。
+
+### 强制校验
 
 - 前置：`python tools/ai_maint.py check` 退出码 0，报告附在方案中。
-- 方案完整性：变更清单、影响面、构建步骤、发布步骤、回滚方案、风险与窗口，六项缺一不可。
-- 执行边界：方案中所有命令必须标注「由人工执行」，AI 不得运行。
-- 确认门槛：必须有管理员书面确认记录，否则不得进入执行阶段。
-- 发布后：人工执行站点抽查（首页、关于、产品、新闻、联系五个页面）并回填结果。
+- 只读确认：`git status` 不得出现方案文档之外的改动，`public/` 未由 AI 生成。
+- 执行边界：AI 不得运行 `hugo`、`hugo deploy` 或任何部署命令。
 - 失败处理：任一校验失败即中止发布，回到方案阶段，不得带病上线。
+
+### 审核门槛
+
+- **校验通过后必须停下等待人工审核，管理员明确确认前不得继续，不得自行发布。**
+- 管理员书面确认 + 人工执行 + 结果回填，三者齐全才算发布完成。
