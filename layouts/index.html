@@ -1,0 +1,96 @@
+{{ define "main" }}
+<section class="hero">
+  <div class="container hero-inner">
+    <p class="eyebrow">企业云 · 数据智能 · 安全合规</p>
+    <h1>{{ site.Params.slogan }}</h1>
+    <p class="hero-lead">{{ site.Params.description }}</p>
+    <div class="hero-actions">
+      <a class="btn btn--primary" href="{{ "/products/" | relURL }}">了解产品</a>
+      <a class="btn btn--ghost" href="{{ "/contact/" | relURL }}">预约咨询</a>
+    </div>
+    <dl class="hero-stats">
+      <div><dt>服务企业</dt><dd>1200+</dd></div>
+      <div><dt>覆盖城市</dt><dd>28</dd></div>
+      <div><dt>平台可用性</dt><dd>99.95%</dd></div>
+    </dl>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">核心能力</p>
+      <h2>从基础设施到业务创新，一次打通</h2>
+      <p class="section-lead">以云原生底座为根基，把数据、应用与安全能力组合成可复用的企业级方案。</p>
+    </div>
+    <div class="grid grid--3">
+      <article class="card">
+        <span class="card-index">01</span>
+        <h3>云原生底座</h3>
+        <p>统一管理多云资源，支持弹性伸缩与灰度发布，让基础设施随业务增长平滑扩展。</p>
+      </article>
+      <article class="card">
+        <span class="card-index">02</span>
+        <h3>数据智能</h3>
+        <p>打通业务数据孤岛，提供实时指标、智能分析与可视化决策支持。</p>
+      </article>
+      <article class="card">
+        <span class="card-index">03</span>
+        <h3>安全合规</h3>
+        <p>覆盖身份、数据与审计的全链路防护，帮助企业满足等保与行业合规要求。</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section section--muted">
+  <div class="container">
+    <div class="section-head section-head--row">
+      <div>
+        <p class="eyebrow">产品矩阵</p>
+        <h2>为成长型企业准备的云产品</h2>
+      </div>
+      <a class="text-link" href="{{ "/products/" | relURL }}">查看全部产品 →</a>
+    </div>
+    <div class="grid grid--3">
+      {{ range first 3 (where site.RegularPages "Section" "products") }}
+        <article class="card card--link">
+          <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+          <p>{{ .Description }}</p>
+          <span class="text-link">了解详情 →</span>
+        </article>
+      {{ end }}
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head section-head--row">
+      <div>
+        <p class="eyebrow">新闻动态</p>
+        <h2>{{ site.Params.brandName }}最新进展</h2>
+      </div>
+      <a class="text-link" href="{{ "/news/" | relURL }}">全部新闻 →</a>
+    </div>
+    <ul class="news-list">
+      {{ range first 3 (where site.RegularPages "Section" "news") }}
+        <li>
+          <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006-01-02" }}</time>
+          <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+        </li>
+      {{ end }}
+    </ul>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="container cta-inner">
+    <div>
+      <h2>准备好开启云上增长了吗？</h2>
+      <p>留下您的业务目标，我们会在一个工作日内安排架构师对接。</p>
+    </div>
+    <a class="btn btn--primary" href="{{ "/contact/" | relURL }}">立即联系</a>
+  </div>
+</section>
+{{ end }}

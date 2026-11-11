@@ -1,0 +1,34 @@
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <a class="brand brand--footer" href="{{ "/" | relURL }}">
+        <span class="brand-mark" aria-hidden="true">云</span>
+        <span class="brand-text">
+          <strong>{{ site.Params.brandName }}</strong>
+          <small>{{ site.Params.brandNameEn }}</small>
+        </span>
+      </a>
+      <p>{{ site.Params.description }}</p>
+    </div>
+    <div>
+      <h2 class="footer-title">快速导航</h2>
+      <ul class="footer-links">
+        {{ range site.Menus.main }}
+          <li><a href="{{ .URL }}">{{ .Name }}</a></li>
+        {{ end }}
+      </ul>
+    </div>
+    <div>
+      <h2 class="footer-title">联系我们</h2>
+      <ul class="footer-links">
+        <li><a href="mailto:{{ site.Params.email }}">{{ site.Params.email }}</a></li>
+        <li>{{ site.Params.phone }}</li>
+        <li>{{ site.Params.address }}</li>
+      </ul>
+    </div>
+  </div>
+  <div class="container footer-bottom">
+    <span>© {{ now.Year }} {{ site.Params.brandName }} 版权所有</span>
+    <span>{{ site.Params.icp }}</span>
+  </div>
+</footer>

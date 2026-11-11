@@ -1,0 +1,28 @@
+{{ define "main" }}
+<section class="page-head">
+  <div class="container">
+    <p class="eyebrow">{{ site.Params.brandName }}</p>
+    <h1>{{ .Title }}</h1>
+    {{ with .Description }}<p>{{ . }}</p>{{ end }}
+  </div>
+</section>
+
+<section class="page-body">
+  <div class="container">
+    {{ with .Content }}<div class="prose">{{ . }}</div>{{ end }}
+
+    {{ $pages := where .Pages "Params.draft" "ne" true }}
+    {{ if $pages }}
+      <div class="card-list">
+        {{ range $pages }}
+          <article class="card">
+            <h2><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
+            {{ if not .Date.IsZero }}<time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006-01-02" }}</time>{{ end }}
+            {{ with .Description }}<p>{{ . }}</p>{{ end }}
+          </article>
+        {{ end }}
+      </div>
+    {{ end }}
+  </div>
+</section>
+{{ end }}

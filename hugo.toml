@@ -1,0 +1,44 @@
+baseURL = "https://www.yunji-tech.example/"
+languageCode = "zh-cn"
+defaultContentLanguage = "zh-cn"
+title = "云际科技"
+enableRobotsTXT = true
+disableKinds = ["taxonomy", "term"]
+
+[params]
+  brandName = "云际科技"
+  brandNameEn = "Yunji Tech"
+  slogan = "让企业上云更简单"
+  description = "云际科技专注企业云平台、数据智能与安全合规，为成长型企业提供可落地的一站式数字化底座。"
+  email = "contact@yunji-tech.example"
+  phone = "400-800-2026"
+  address = "杭州市滨江区云际大厦 18 层"
+  icp = "浙ICP备2026000000号-1"
+
+[params.social]
+  wechat = "yunji-tech"
+
+[[menus.main]]
+  name = "首页"
+  pageRef = "/"
+  weight = 10
+
+[[menus.main]]
+  name = "关于我们"
+  pageRef = "/about/"
+  weight = 20
+
+[[menus.main]]
+  name = "产品与服务"
+  pageRef = "/products/"
+  weight = 30
+
+[[menus.main]]
+  name = "新闻动态"
+  pageRef = "/news/"
+  weight = 40
+
+[[menus.main]]
+  name = "联系我们"
+  pageRef = "/contact/"
+  weight = 50
