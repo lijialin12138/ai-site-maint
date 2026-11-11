@@ -4,6 +4,8 @@ description: 一句话说明该 Skill 解决什么问题、适用于什么场景
 risk: L2
 version: 1.1.0
 owner: 待填写
+# 注意：allowed-paths 必须按本 Skill 实际职责填写，不要照抄 content/。
+# 例如 media-manage 需加 static/images/、assets/images/；release 需加 .harness/reports/。
 allowed-paths:
   - content/
 denied-paths:
