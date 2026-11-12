@@ -2,7 +2,7 @@
 name: page-create
 description: 在云际科技站点新建页面，包括新闻稿、产品详情页与普通内容页，负责 front matter 与正文骨架。
 risk: L2
-version: 1.1.0
+version: 1.2.1
 owner: 内容运营组
 allowed-paths:
   - content/
@@ -46,9 +46,9 @@ required-checks:
 | `content/products/<slug>.md` | 新增 | 产品详情页，需设置 `weight` |
 | `content/<section>/<slug>.md` | 新增 | 普通内容页，需确认栏目已存在 |
 | `data/` | 新增 | 仅限内容类数据文件 |
-| `.harness/reports/` | 新增 | 发布记录 |
 
 同一页面类型单次最多新增 1 个文件；批量建页需拆分任务。
+变更记录写在任务回复中（AGENTS.md 标准交付格式）；`.harness/reports/` 按红线 1 仅 L1/L3 Skill 可写，本 Skill 不写。
 
 ## 3. 禁止的操作范围（黑名单）
 
@@ -56,6 +56,7 @@ required-checks:
 - 禁止改动 `layouts/`、`hugo.toml`、`assets/`、`static/`、`tools/`、`.harness/AGENTS.md`、`.harness/skills/`。
 - 禁止新增栏目目录或修改 `hugo.toml` 菜单。
 - 禁止编造客户全名、融资金额、市场份额、认证结论；不确定的信息标注「待确认」并上报。
+- 用户明确要求「先这么写」的未核实数字：可以写入，但必须标注「待确认」并在汇报中列出，不得表述为已确认事实。
 - 禁止使用「第一」「唯一」「最安全」等绝对化表述。
 - 禁止插入外部图片、脚本、追踪代码。
 - 禁止把 `date` 设置在当前日期之后；预约发布需人工处理。
@@ -66,13 +67,16 @@ required-checks:
 
 1. 读取 `.harness/AGENTS.md` 与目标栏目的 `_index.md`，确认页面定位。
 2. 参考同栏目最近一篇内容，确认 front matter 字段与正文风格。
-3. 校验事实来源：客户名称、金额、日期、资质，缺失则标注并上报。
+3. 校验事实来源，分两级处理：
+   - 核心字段缺失（标题、日期、作者、主题不明确）：停下问管理员，不产出半成品稿件；
+   - 支撑事实缺失（数字、客户名、金额、资质）：可先起草，但必须标注「待确认」并上报，禁止编造。
 4. 生成 slug：小写、短横线分隔、不超过 60 字符，且不与现有文件重名。
 5. 写入新文件，front matter 必须含 `title`、`date`、`description`、`author`（新闻）或 `weight`（产品）。
-6. 核对 `description` 长度为 40–120 字，正文不写一级标题。
-7. 核对品牌名、产品名与 `hugo.toml` 一致。
-8. 运行 `python tools/ai_maint.py check`。
-9. 输出文件路径、摘要、校验结果、待确认事实，请求人工审核。
+6. 核对站内链接：栏目页链接写 `/section/`（对应 `_index.md`），叶子页链接写 `/section/<slug>`（**不带尾斜杠**，对应 `<slug>.md`，校验脚本只认这种写法）；无法确认目标存在时，先读 `content/` 目录核实，不得凭印象写链接。
+7. 核对 `description` 长度为 40–120 字，正文不写一级标题。
+8. 核对品牌名、产品名与 `hugo.toml` 一致。
+9. 停下，明确提示管理员在本机运行 `python tools/ai_maint.py check`（无 Python 时用 `node tools/check.mjs`），等待管理员回报结果；AI 不得自行运行校验，不得伪造校验结果。
+10. 输出文件路径、摘要、校验结果、待确认事实，请求人工审核。
 
 ## 5. 完成标准 + 强制校验（Verify）
 
@@ -81,11 +85,14 @@ required-checks:
 - 新文件位于白名单目录，文件名符合 `^[a-z0-9-]+\.md$`，且未覆盖任何已有文件。
 - front matter 字段齐全：`title`、`date`、`description`；新闻含 `author`，产品含 `weight`。
 - `description` 为 40–120 字，正文无一级标题，无绝对化表述。
+- 未核实的数字、客户、资质：已标注「待确认」并列入待人工确认项，未作为事实陈述。
+- 核心字段缺失时已停下询问，未产出瞎编稿件。
 - 站内链接目标存在，图片引用有 alt。
 - 改动文件清单、摘要、校验结果、待确认项齐全。
 
 ### 强制校验
 
+- 校验由管理员本机执行（AI 环境无 Python/Hugo）：AI 改完必须停下，提示管理员运行 `python tools/ai_maint.py check`（无 Python 时用 `node tools/check.mjs`），并等待回报。
 - 必跑：`python tools/ai_maint.py check`，退出码必须为 0。
 - 文件检查：命名、front matter、描述长度三项全部通过。
 - 内容检查：事实有来源，无未确认数字，无外部资源。

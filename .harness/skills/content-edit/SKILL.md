@@ -2,7 +2,7 @@
 name: content-edit
 description: 修改云际科技站点已有页面的中文文案与内容结构，适用于首页、关于、产品、新闻、联系等页面。
 risk: L2
-version: 1.1.0
+version: 1.2.0
 owner: 内容运营组
 allowed-paths:
   - content/
@@ -43,15 +43,15 @@ required-checks:
 
 | 路径 | 允许操作 | 约束 |
 | --- | --- | --- |
-| `content/_index.md` | 修改 | 仅正文，front matter 只允许改 `description` |
+| `content/_index.md` | 修改 | 仅正文；front matter 只允许改 `description`，且改后必须为 40–120 字（含标点，与校验脚本 `len()` 口径一致） |
 | `content/about/_index.md` | 修改 | 保留发展历程的时间线事实 |
 | `content/contact/_index.md` | 修改 | 联系方式必须与 `hugo.toml` 一致 |
-| `content/products/*.md` | 修改 | 仅说明性文字，不改产品名与 `weight` |
+| `content/products/*.md` | 修改 | 仅说明性文字，不改产品名与 `weight`；`description` 改后 40–120 字 |
 | `content/news/*.md` | 修改 | 不改 `title`、`date`、`author` |
 | `data/` | 修改 | 仅限内容类数据文件，不写密钥或隐私数据 |
-| `.harness/reports/` | 新增 | 变更记录 |
 
 白名单之外一律视为越界。单次改动文件数不超过 5 个。
+变更记录写在任务回复中（AGENTS.md 标准交付格式）；`.harness/reports/` 按红线 1 仅 L1/L3 Skill 可写，本 Skill 不写。
 
 ## 3. 禁止的操作范围（黑名单）
 
@@ -69,8 +69,8 @@ required-checks:
 2. 读取目标文件全文及所在目录的 `_index.md`，确认页面定位与上下文。
 3. 检查请求是否涉及黑名单；涉及则停止并上报，不产出改动。
 4. 以最小 diff 修改正文，保持原有 Markdown 层级与中文标点风格。
-5. 对照 `hugo.toml` 核对品牌名、邮箱、电话、地址。
-6. 运行 `python tools/ai_maint.py check`。
+5. 对照 `hugo.toml` 核对品牌名、邮箱、电话、地址；若本次修改了 `description`，逐字核对改后长度为 40–120 字（含标点与空格），超长必须删减到区间内。
+6. 停下，明确提示管理员在本机运行 `python tools/ai_maint.py check`（无 Python 时用 `node tools/check.mjs`），等待管理员回报结果；AI 不得自行运行校验，不得伪造校验结果。
 7. 汇总改动文件、改动摘要、校验结果、待确认事实。
 8. 展示校验结果后请求人工审核，审核通过前不得视为完成。
 
@@ -80,11 +80,13 @@ required-checks:
 
 - 目标页面的文案已按需求修改，且只动了白名单内的文件。
 - 页面结构保持在「产品定位/栏目说明/正文」原有层级，正文没有新增一级标题。
+- 若修改了 front matter 的 `description`，改后长度为 40–120 字（含标点）。
 - 改动文件清单、变更摘要、校验结果、待确认项四项齐全。
 - 所有新增事实（数字、时间、客户、资质）有来源，或标注「待确认」。
 
 ### 强制校验
 
+- 校验由管理员本机执行（AI 环境无 Python/Hugo）：AI 改完必须停下，提示管理员运行 `python tools/ai_maint.py check`（无 Python 时用 `node tools/check.mjs`），并等待回报。
 - 必跑：`python tools/ai_maint.py check`，退出码必须为 0，且品牌与页面检查项全部通过。
 - 人工核对：品牌名、产品名、联系方式与 `hugo.toml` 一致。
 - 失败处理：回退本次 diff，修复后重跑；连续两次失败则停止并上报。
