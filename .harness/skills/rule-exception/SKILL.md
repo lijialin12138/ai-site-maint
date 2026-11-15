@@ -2,7 +2,7 @@
 name: rule-exception
 description: 当需求必须越过白名单或黑名单时，生成例外申请与影响面分析，交由管理员审批，不自行放行。
 risk: L3
-version: 1.2.0
+version: 1.3.0
 owner: 平台管理员
 allowed-paths:
   - .harness/reports/exceptions/
@@ -27,6 +27,8 @@ required-checks:
 > 硬约束：AI 无权批准例外，也无权在批准前执行任何越界改动
 
 ## 1. 触发条件（When）
+
+**最高优先级硬路由：涉及品牌锁定字段的任何变更请求，一律路由到本 Skill，优先级最高。品牌锁定字段包括：品牌名「云际科技」「Yunji Tech」、产品名、slogan、联系方式（邮箱/电话/地址）、备案号。只要请求动了这些字段之一，无论措辞是「改文案」「改 slogan」「改品牌」「调整主题视觉」，都先走本 Skill 出例外申请，不得用 release 或 theme-change 处理。**
 
 - 任务要求修改白名单之外的目录或文件。
 - 任务与 `.harness/AGENTS.md` 红线冲突，例如需要改品牌、改布局、动配置。

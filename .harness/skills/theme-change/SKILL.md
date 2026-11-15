@@ -2,7 +2,7 @@
 name: theme-change
 description: 调整站点版面、主题、配色与导航结构的高风险流程，只输出方案与影响面，不执行任何改动。
 risk: L3
-version: 1.1.0
+version: 1.2.0
 owner: 前端负责人
 allowed-paths:
   - .harness/reports/
@@ -37,7 +37,7 @@ required-checks:
 - 只改文字内容：使用 `content-edit`。
 - 只换图片素材：使用 `media-manage`。
 - 生产发布：使用 `release`。
-- 涉及品牌名、Logo、slogan 的视觉调整：先按品牌锁定红线上报，再走本流程。
+- 涉及品牌锁定字段（品牌名/slogan/联系方式/备案号）的任何变更——无论是视觉还是文案——一律不适用本 Skill，必须转 rule-exception 出例外申请。
 
 ## 2. 允许的操作范围（白名单）
 

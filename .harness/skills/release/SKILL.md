@@ -2,7 +2,7 @@
 name: release
 description: 生产构建与发布的高风险流程，只输出发布方案、影响面与回滚步骤，不执行任何改动。
 risk: L3
-version: 1.2.0
+version: 1.3.0
 owner: 发布管理员
 allowed-paths:
   - .harness/reports/
@@ -36,6 +36,7 @@ required-checks:
 
 以下情况不启用：
 
+- 涉及品牌锁定字段（品牌名/slogan/联系方式/备案号）的变更：不适用本 Skill，必须转 rule-exception 出例外申请。
 - 本地预览、改文案、改样式：属于 L2 范围，不走发布流程。
 - 需要紧急修复线上故障：先按 `rule-exception` 申报，再走本流程。
 - 需要修改服务器、Nginx、证书、DNS：超出本仓库范围，直接转运维人工处理。
