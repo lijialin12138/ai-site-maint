@@ -2,7 +2,7 @@
 name: qa
 description: 站点质量检查的只读入口，覆盖结构、链接、front matter、内容规范与 Skill 五段式，输出问题报告。
 risk: L1
-version: 1.1.0
+version: 1.2.0
 owner: 质量保障组
 allowed-paths:
   - .harness/reports/
@@ -59,13 +59,13 @@ required-checks:
 ## 4. 执行步骤（Steps）
 
 1. 读取 `.harness/AGENTS.md`、`.harness/skills/` 清单与 `tools/ai_maint.py` 的检查项。
-2. 运行 `python tools/ai_maint.py check`，记录通过/失败项。
+2. 对照当前 `hugo.toml` 与 Python、Node 校验器的配置规则。发现能从源码确定的失败条件（例如校验器仍要求已移除的配置键），列为阻断，注明配置与脚本位置、触发条件和影响。旧的通过记录不能抵消已确认的冲突。
 3. 检查 front matter：每个内容文件是否有 `title`、`date`、`description`；`description` 是否在 40–120 字。
 4. 检查文件名：内容文件是否符合小写短横线命名，是否有 `draft=true` 未发布稿件。
-5. 检查链接：站内链接是否指向存在的页面，图片引用是否存在，菜单 `pageRef` 是否有效。
+5. 检查站内链接、图片引用和菜单 `pageRef` 的目标。记录链接所在源文件的实际行号、目标和依据。只能从源码确认目标存在时，标明构建结果待验证。
 6. 检查内容规范：正文是否出现一级标题、绝对化表述、未标注的占位事实。
 7. 检查 Skill：8 个核心 Skill 是否齐全，五段式标题是否完整，第 5 段是否含「不得自行发布」。
-8. 生成 `.harness/reports/qa-report.md`，按阻断、重要、建议三级归类。
+8. 在 `.harness/reports/qa-report.md` 中记录阻断、重要、建议与待核实项。若用户要求仅在对话中报告，则在对话中按同样结构输出。
 9. 输出结论：阻断项数量、重要项数量、建议项数量、责任 Skill。
 
 ## 5. 完成标准 + 强制校验（Verify）
@@ -74,11 +74,12 @@ required-checks:
 
 - 报告覆盖：结构、front matter、命名、链接、内容规范、Skill 规范六类。
 - 每条问题含文件路径（链接问题含行号）、现状、等级、建议动作、责任 Skill。
-- 结论明确：存在阻断项时不得给出「通过」结论。
+- 结论同时列出静态核对发现的阻断和本次正式校验状态。校验待确认时，仅报告静态初检结论。存在阻断项时不得给出「通过」结论。
 
 ### 强制校验
 
-- 必跑：`python tools/ai_maint.py check`，退出码必须为 0 才能判定基线通过。
+- 由管理员在本机运行 `python tools/ai_maint.py check`。无 Python 时使用 `node tools/check.mjs`。AI 记录本次回报的结果和输出摘要，未收到结果时标为「待管理员校验」。历史报告仅供参考。
+- 收到本次退出码为 0 的结果后，才可记录正式校验已通过。
 - 只读确认：除 `qa-report.md` 外无任何文件改动。
 - 检查范围确认：8 个核心 Skill 名单逐一核对，不得以「数量够」代替名单核对。
 - 失败处理：校验脚本自身失败时，先报告脚本错误，不得手工修改脚本绕过。
