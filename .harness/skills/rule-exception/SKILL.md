@@ -2,7 +2,7 @@
 name: rule-exception
 description: 当需求必须越过白名单或黑名单时，生成例外申请与影响面分析，交由管理员审批，不自行放行。
 risk: L3
-version: 1.1.0
+version: 1.2.0
 owner: 平台管理员
 allowed-paths:
   - .harness/reports/exceptions/
@@ -50,13 +50,14 @@ required-checks:
 
 ## 3. 禁止的操作范围（黑名单）
 
-- 禁止自行修改 `.harness/AGENTS.md`、`.harness/skills/**`、`tools/ai_maint.py` 来「合法化」越界行为。
+- 禁止自行修改 `.harness/AGENTS.md`、`.harness/skills/**`、`tools/ai_maint.py`、`tools/check.mjs` 来「合法化」越界行为。
 - 禁止在申请未批准前执行任何越界改动，包括试改、临时改、改完再回滚。
 - 禁止把例外范围写成「相关目录」「必要时调整」等模糊表述。
 - 禁止一次申请覆盖多个不相关的高风险变更。
 - 禁止代替管理员签字、伪造审批记录或倒签日期。
 - 禁止删除审计记录与历史申请单。
 - 批准后仍不得由 AI 直接执行 L3 改动；只能转人工执行。
+- **AI 不得执行任何越界改动**：本 Skill 全程不执行任何代码/文件改动，只产出申请单与影响面分析，等待管理员审批；审批通过后改动仍由对应 L2 Skill 或人工执行。
 
 ## 4. 执行步骤（Steps）
 
@@ -67,7 +68,7 @@ required-checks:
 5. 给出回滚方案：回滚步骤、验证方式、责任人。
 6. 设定时限：例外有效期精确到日期，到期自动失效。
 7. 写入申请单，状态标记为「待审批」，提交管理员。
-8. 管理员书面批准后，仍由对应 L2 Skill 执行改动并跑校验；AI 不直接执行 L3 改动。
+8. 管理员书面批准后，仍由对应 L2 Skill 执行改动；改完停下，提示管理员在本机运行 `python tools/ai_maint.py check`（无 Python 时用 `node tools/check.mjs`），等待回报；AI 不直接执行 L3 改动、不自行运行校验。
 9. 回填审批结果与执行记录，归档到 `exceptions/`。
 
 ## 5. 完成标准 + 强制校验（Verify）
@@ -80,7 +81,7 @@ required-checks:
 
 ### 强制校验
 
-- 必跑：`python tools/ai_maint.py check`，确认申请前后站点基线未被破坏。
+- 基线：由管理员在本机运行 `python tools/ai_maint.py check`，确认申请前后站点基线未被破坏；AI 不得自行运行或伪造。
 - 范围核对：申请单中的路径必须逐条对应实际文件或目录。
 - 只读确认：`git status` 只能出现申请单文件。
 - 失败处理：基线校验失败时不得提交申请，先修复基线问题。

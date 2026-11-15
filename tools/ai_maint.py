@@ -196,9 +196,10 @@ def check_config():
             messages.append(f"配置缺少品牌项：{item}")
     if "baseURL" not in raw:
         messages.append("配置缺少 baseURL")
-    for lang in ('languageCode = "zh-cn"', 'defaultContentLanguage = "zh-cn"'):
-        if lang not in raw:
-            messages.append(f"配置缺少语言项：{lang}")
+    if 'defaultContentLanguage = "zh-cn"' not in raw:
+        messages.append('配置缺少语言项：defaultContentLanguage = "zh-cn"')
+    if 'languageCode = "zh-cn"' not in raw and 'locale = "zh-cn"' not in raw:
+        messages.append('配置缺少语言项：languageCode = "zh-cn" 或 locale = "zh-cn"（二选一）')
     record("站点配置", not messages, messages)
 
 

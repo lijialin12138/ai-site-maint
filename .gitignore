@@ -23,3 +23,6 @@ Thumbs.db
 *.tmp
 *.log
 *.swp
+
+# 校验脚本动态生成的报告（每次 check 重写，不入库）
+.harness/reports/check-report.md
